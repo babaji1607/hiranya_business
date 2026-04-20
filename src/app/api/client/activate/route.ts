@@ -38,10 +38,12 @@ export async function POST(req: Request) {
     const { key, hwid, deviceId: incomingDeviceId, os: incomingOs } = await req.json();
     let deviceId = incomingDeviceId;
     let os = incomingOs;
+    const osDeviceIds = ['windows', 'linux', 'macos', 'mac'];
+    const normalizedDeviceId = typeof deviceId === 'string' ? deviceId.toLowerCase() : '';
 
     // Workaround for client mistakenly sending OS name as deviceId
-    if (deviceId === 'windows' || deviceId === 'linux' || deviceId === 'macos' || deviceId === 'mac') {
-      os = os || deviceId; // Set OS if not provided
+    if (osDeviceIds.includes(normalizedDeviceId)) {
+      os = os || normalizedDeviceId; // Set OS if not provided
       deviceId = hwid; // Use hwid as the unique deviceId
     }
 
