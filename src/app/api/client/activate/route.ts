@@ -35,7 +35,20 @@ import { eq, and } from 'drizzle-orm';
  */
 export async function POST(req: Request) {
   try {
-    const { key, hwid, deviceId, os } = await req.json();
+    const { key, hwid, deviceId: incomingDeviceId, os: incomingOs } = await req.json();
+    let deviceId = incomingDeviceId;
+    let os = incomingOs;
+    const osDeviceIds = new Set(['windows', 'linux', 'macos', 'mac']);
+    const normalizedDeviceId = typeof deviceId === 'string' ? deviceId.toLowerCase() : '';
+
+    // Workaround for client mistakenly sending OS name as deviceId
+    if (osDeviceIds.has(normalizedDeviceId)) {
+      if (!hwid) {
+        return NextResponse.json({ error: 'Missing required field: hwid' }, { status: 400 });
+      }
+      os = os || incomingDeviceId; // Set OS if not provided
+      deviceId = hwid; // Use hwid as the unique deviceId
+    }
 
     if (!key || !hwid || !deviceId) {
       return NextResponse.json({ error: 'Missing required fields: key, hwid, deviceId' }, { status: 400 });
