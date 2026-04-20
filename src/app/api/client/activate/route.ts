@@ -43,6 +43,9 @@ export async function POST(req: Request) {
 
     // Workaround for client mistakenly sending OS name as deviceId
     if (osDeviceIds.has(normalizedDeviceId)) {
+      if (!hwid) {
+        return NextResponse.json({ error: 'Missing required field: hwid' }, { status: 400 });
+      }
       os = os || incomingDeviceId; // Set OS if not provided
       deviceId = hwid; // Use hwid as the unique deviceId
     }
