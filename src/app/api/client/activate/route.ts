@@ -35,7 +35,9 @@ import { eq, and } from 'drizzle-orm';
  */
 export async function POST(req: Request) {
   try {
-    let { key, hwid, deviceId, os } = await req.json();
+    const { key, hwid, deviceId: incomingDeviceId, os: incomingOs } = await req.json();
+    let deviceId = incomingDeviceId;
+    let os = incomingOs;
 
     // Workaround for client mistakenly sending OS name as deviceId
     if (deviceId === 'windows' || deviceId === 'linux' || deviceId === 'macos' || deviceId === 'mac') {
